@@ -16,13 +16,19 @@ function App() {
 
   return (
     <Router>
-      <header style={{ padding: "10px", backgroundColor: "#eee" }}>
-        <nav>
-          <Link to="/" style={{ marginRight: "10px" }}>Home</Link>
-          <Link to="/about" style={{ marginRight: "10px" }}>About</Link>
-          <Link to="/add">Add Employee</Link>
-        </nav>
-      </header>
+      <header style={{
+  padding: "10px 20px",
+  backgroundColor: "#eee",
+  display: "flex",
+  justifyContent: "flex-start",
+  alignItems: "center",
+  gap: "20px"
+}}>
+  <Link to="/">Home</Link>
+  <Link to="/about">About</Link>
+  <Link to="/add">Add Employee</Link>
+</header>
+
 
       <Routes>
         <Route path="/" element={<PersonList employees={employees} />} />
