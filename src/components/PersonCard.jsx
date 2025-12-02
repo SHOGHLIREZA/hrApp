@@ -1,44 +1,98 @@
+import { useState } from "react";
+import axios from "axios";
 
-const PersonCard = ({ employee }) => {
+const PersonCard = ({ employee, onUpdateEmployee }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    salary: employee.salary,
+    location: employee.location,
+    department: employee.department,
+    skills: employee.skills.join(", ") // تبدیل به رشته برای input
+  });
+  const [message, setMessage] = useState("");
 
-  const start = new Date(employee.startDate);
-  const now = new Date();
-  const yearsWorked = (now - start) / (1000 * 60 * 60 * 24 * 365);
-
-
-  const animalEmojis = {
-    Owl: "🦉",
-    Dog: "🐶",
-    Cat: "🐱",
-    Fox: "🦊",
-    Rabbit: "🐰",
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditData({ ...editData, [name]: value });
   };
-  const animalEmoji = animalEmojis[employee.animal] || "🐾";
 
-  // پیام‌های مخصوص سالگرد یا دوره‌ی آزمایشی
-  let message = "";
-  if (yearsWorked >= 5 && yearsWorked % 5 < 1) {
-    message = "🎉 Schedule recognition meeting.";
-  } else if (yearsWorked < 0.5) {
-    message = "🔔 Schedule probation review.";
-  }
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditData({
+      salary: employee.salary,
+      location: employee.location,
+      department: employee.department,
+      skills: employee.skills.join(", ")
+    });
+    setMessage("");
+  };
+
+  const handleSave = async () => {
+    const updatedEmployee = {
+      salary: Number(editData.salary),
+      location: editData.location,
+      department: editData.department,
+      skills: editData.skills.split(",").map((s) => s.trim())
+    };
+
+    try {
+      const res = await axios.patch(
+        `http://localhost:3001/employees/${employee.id}`,
+        updatedEmployee
+      );
+
+      // آپدیت state محلی در parent
+      onUpdateEmployee(res.data);
+
+      setMessage("Changes saved ✅");
+      setIsEditing(false);
+
+      setTimeout(() => setMessage(""), 3000); // پیام بعد از 3 ثانیه ناپدید شود
+    } catch (err) {
+      console.error(err);
+      setMessage("Error saving changes ❌");
+    }
+  };
 
   return (
-    <div style={{
-      border: "1px solid #ccc",
-      borderRadius: "10px",
-      margin: "10px",
-      padding: "15px",
-      backgroundColor: "#f9f9f9"
-    }}>
-      <h3>{employee.name} {animalEmoji}</h3>
-      <p><strong>{employee.title}</strong> — {employee.department}</p>
-      <p>📍 {employee.location}</p>
-      <p>Years worked: {yearsWorked.toFixed(1)}</p>
-      {message && <p>{message}</p>}
-      <p>📧 {employee.email}</p>
-      <p>📱 {employee.phone}</p>
-      <p>💰 Salary: {employee.salary} €</p>
+    <div style={{ border: "1px solid #ccc", padding: "15px", margin: "10px", borderRadius: "8px" }}>
+      <h3>{employee.name}</h3>
+      <p>Title: {employee.title}</p>
+
+      {isEditing ? (
+        <>
+          <div>
+            <label>Salary:</label>
+            <input type="number" name="salary" value={editData.salary} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Location:</label>
+            <input type="text" name="location" value={editData.location} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Department:</label>
+            <input type="text" name="department" value={editData.department} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Skills (comma separated):</label>
+            <input type="text" name="skills" value={editData.skills} onChange={handleChange} />
+          </div>
+
+          <button onClick={handleSave}>Save</button>
+          <button onClick={handleCancel}>Cancel</button>
+        </>
+      ) : (
+        <>
+          <p>Salary: {employee.salary}</p>
+          <p>Location: {employee.location}</p>
+          <p>Department: {employee.department}</p>
+          <p>Skills: {employee.skills.join(", ")}</p>
+
+          <button onClick={() => setIsEditing(true)}>Edit</button>
+        </>
+      )}
+
+      {message && <p style={{ color: "green" }}>{message}</p>}
     </div>
   );
 };
