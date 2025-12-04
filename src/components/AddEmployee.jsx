@@ -1,6 +1,9 @@
 import { useState } from "react";
+import useAxios from "../hooks/useAxios"; 
 
 const AddEmployee = ({ onAddEmployee }) => {
+  const { post } = useAxios(); 
+
   const [formData, setFormData] = useState({
     name: "",
     title: "",
@@ -14,39 +17,47 @@ const AddEmployee = ({ onAddEmployee }) => {
     skills: ""
   });
 
+  const [message, setMessage] = useState(""); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     const newEmployee = {
-      id: Date.now(),
       ...formData,
       salary: Number(formData.salary),
       skills: formData.skills.split(",").map(skill => skill.trim())
     };
 
+    try {
 
-    onAddEmployee(newEmployee);
+      const res = await post("http://localhost:3001/employees", newEmployee);
+      onAddEmployee(res.data);
+      setMessage("Employee added ✅");
 
 
-    setFormData({
-      name: "",
-      title: "",
-      salary: "",
-      phone: "",
-      email: "",
-      animal: "",
-      startDate: "",
-      location: "",
-      department: "",
-      skills: ""
-    });
+      setFormData({
+        name: "",
+        title: "",
+        salary: "",
+        phone: "",
+        email: "",
+        animal: "",
+        startDate: "",
+        location: "",
+        department: "",
+        skills: ""
+      });
+
+      setTimeout(() => setMessage(""), 3000); // پیام بعد از 3 ثانیه پاک شود
+    } catch (err) {
+      console.error(err);
+      setMessage("Error adding employee ❌");
+    }
   };
 
   return (
@@ -67,6 +78,7 @@ const AddEmployee = ({ onAddEmployee }) => {
         ))}
         <button type="submit">Add Employee</button>
       </form>
+      {message && <p style={{ color: message.includes("Error") ? "red" : "green" }}>{message}</p>}
     </div>
   );
 };

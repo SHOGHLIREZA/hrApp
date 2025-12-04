@@ -1,13 +1,15 @@
 import { useState } from "react";
-import axios from "axios";
+import useAxios from "../hooks/useAxios"; 
 
 const PersonCard = ({ employee, onUpdateEmployee }) => {
+  const { patch } = useAxios(); 
+
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     salary: employee.salary,
     location: employee.location,
     department: employee.department,
-    skills: employee.skills.join(", ") // تبدیل به رشته برای input
+    skills: employee.skills.join(", ") 
   });
   const [message, setMessage] = useState("");
 
@@ -36,18 +38,19 @@ const PersonCard = ({ employee, onUpdateEmployee }) => {
     };
 
     try {
-      const res = await axios.patch(
+
+      const res = await patch(
         `http://localhost:3001/employees/${employee.id}`,
         updatedEmployee
       );
 
-      // آپدیت state محلی در parent
+
       onUpdateEmployee(res.data);
 
       setMessage("Changes saved ✅");
       setIsEditing(false);
 
-      setTimeout(() => setMessage(""), 3000); // پیام بعد از 3 ثانیه ناپدید شود
+      setTimeout(() => setMessage(""), 3000); 
     } catch (err) {
       console.error(err);
       setMessage("Error saving changes ❌");
