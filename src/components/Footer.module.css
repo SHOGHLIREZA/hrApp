@@ -1,0 +1,17 @@
+.footer {
+  text-align: center;
+  padding: 20px;
+  background-color: rgb(178, 206, 206);
+  color: #0909f5;
+}
+
+.authorLink {
+  color: blue; /* link color */
+  text-decoration: underline; /* always underlined */
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.authorLink:hover {
+  color: #e307d8;
+}

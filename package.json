@@ -9,9 +9,11 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "json-server --watch db.json --port 3001"
-
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.6",
     "axios": "^1.13.2",
     "prop-types": "^15.8.1",
     "react": "^19.1.1",
@@ -29,5 +31,18 @@
     "globals": "^16.4.0",
     "json-server": "^1.0.0-beta.3",
     "vite": "^7.1.7"
-  }
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "eslint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SHOGHLIREZA/hrApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SHOGHLIREZA/hrApp/issues"
+  },
+  "homepage": "https://github.com/SHOGHLIREZA/hrApp#readme"
 }

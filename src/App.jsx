@@ -1,71 +1,113 @@
-import { useState, useEffect } from "react";
-import PersonList from "./components/PersonList";
-import About from "./components/About";
-import AddEmployee from "./components/AddEmployee";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import useAxios from "./hooks/useAxios"; 
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './App.css';
 
+import Layout from './Layout';
+import PersonList from './components/PersonList';
+import About from './pages/About';
+import AddEmployee from './pages/AddEmployee';
+import ErrorPage from './pages/ErrorPage';
+import useAxios from './hooks/useAxios';
+import EmployeesTable from './components/EmployeesTable';
+import EmployeeTablePage from './pages/EmployeeTablePage';
 function App() {
-  const { get, post } = useAxios(); 
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  const [employees, setEmployees] = useState([]); //Employee state
+  const [formData, setFormData] = useState({
+    name: '',
+    title: '',
+    salary: '',
+    phone: '',
+    email: '',
+    animal: '',
+    startDate: '',
+    location: '',
+    department: '',
+    skills: '',
+  });
+
+ 
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      title: '',
+      salary: '',
+      phone: '',
+      email: '',
+      animal: '',
+      startDate: '',
+      location: '',
+      department: '',
+      skills: '',
+    });
+  };
+
+
+  const updateEmployee = (updatedEmployee) => {
+    setEmployees((prev) =>
+      prev.map((emp) => (emp.id === updatedEmployee.id ? updatedEmployee : emp))
+    );
+  };
+
+  const { get, post } = useAxios();
 
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const res = await get("http://localhost:3001/employees"); // یا آدرس Render
-        setEmployees(res.data);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-    };
+    get('http://localhost:3001/employees').then((response) => {
+      setEmployees(response.data);
+    });
+  }, []);
 
-    fetchEmployees();
-  }, [get]);
+  
+  const onAddEmployee = () => {
+    post('https://hrapp-bec7.onrender.com/employees', {
+      id: (employees.length + 1).toString(),
+      ...formData,
+      skills: formData.skills.split(',').map((skill) => skill.trim()),
+    })
+      .then((response) => {
+        setEmployees([...employees, response.data]);
+        resetForm(); // Reset form after successful POST
 
-  // تابع برای اضافه کردن کارمند جدید
-  const handleAddEmployee = async (newEmployee) => {
-    try {
-      const res = await post("http://localhost:3001/employees", newEmployee);
-      setEmployees([...employees, res.data]);
-    } catch (err) {
-      console.error(err);
-      alert("Error adding employee ❌");
-    }
+        alert('Employee added successfully!');
+      })
+      .catch((error) => {
+        console.error(
+          'Error adding employee:',
+          error.response.data || error.message
+        );
+      });
   };
-
-  if (loading) {
-    return <p>Loading employees...</p>;
-  }
 
   return (
     <Router>
-      <header style={{
-        padding: "10px 20px",
-        backgroundColor: "#eee",
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        gap: "20px"
-      }}>
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-        <Link to="/add">Add Employee</Link>
-      </header>
-
       <Routes>
-        <Route path="/" element={<PersonList employees={employees} />} />
-        <Route path="/about" element={<About />} />
-        <Route
-          path="/add"
-          element={<AddEmployee onAddEmployee={handleAddEmployee} />}
-        />
+        <Route path="/" element={<Layout />}>
+          <Route
+            index
+            element={
+              <PersonList
+                employees={employees}
+                updateEmployee={updateEmployee}
+              />
+            }
+          />
+          <Route path="about" element={<About />} />
+          <Route
+            path="add"
+            element={
+              <AddEmployee
+                formData={formData}
+                setFormData={setFormData}
+                onAddEmployee={onAddEmployee}
+              />
+            }
+          />
+          <Route path="table" element={<EmployeeTablePage />} />
+          <Route path="*" element={<ErrorPage />} />
+        </Route>
       </Routes>
     </Router>
   );
 }
-
 export default App;
