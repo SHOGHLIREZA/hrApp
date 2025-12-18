@@ -53,7 +53,7 @@ function App() {
 
 
   useEffect(() => {
-    get('http://localhost:4000/employees').then((response) => {
+    get('https://backend-q0gp.onrender.com/employees').then((response) => {
       setEmployees(response.data);
     });
   }, []);

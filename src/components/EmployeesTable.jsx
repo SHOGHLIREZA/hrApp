@@ -18,7 +18,7 @@ const EmployeesTable = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:4000/employees')
+      .get('https://backend-q0gp.onrender.com/employees')
       .then((res) => setData(res.data))
       .catch((err) => setError(err))
       .finally(() => setLoading(false));
