@@ -18,7 +18,7 @@ const EmployeesTable = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3001/employees')
+      .get('http://localhost:4000/employees')
       .then((res) => setData(res.data))
       .catch((err) => setError(err))
       .finally(() => setLoading(false));
